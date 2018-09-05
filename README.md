@@ -4,6 +4,7 @@ download python 3 from http:www.python.org
 
 I use this to learn Python
 
+![screenshot](screenshot1.png)
 
 ## how to play
 
