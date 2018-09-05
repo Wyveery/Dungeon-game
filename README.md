@@ -10,13 +10,13 @@ I use this to learn Python
 use aswd to move 
 use "up" and "down" to go down and up from the floor
 
-### items are in lower case: 
+#### items are in lower case: 
     f..... food
     k ..... key
     $ ...... gold
     b ....... box
 
-### Monsters are in upper case:
+#### Monsters are in upper case:
     M ...... Monster
     B ...... Bat 
     D ...... Dragon
