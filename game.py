@@ -2,7 +2,7 @@ import random
 
 # TODO: truhe mit schlüssel
 
-legende = {"." : "Boden",
+legende = {"." : "Boden", 
            "k" : "Käse",
            "d" : "Diamant",
            "b" : "Burger",
@@ -18,9 +18,9 @@ legende = {"." : "Boden",
 
 level1 = """
 ###################################
-#>..........#....................1#
-#...........d....k................#
-#§..........#...........M.........#
+#>.......#........M..............1#
+#........d..k............M........#
+#§.......#........M...............#
 ###################################"""
 
 level2 = """
@@ -32,20 +32,20 @@ level2 = """
 
 level3 = """
 ###################################
-#<...............................3#
-#>................D...............#
-#.................................#
+#<......#..d.......d.............3#
+#>......####.......#..........D...#
+#......M..§........#.............§#
 ###################################"""
 
 
 
 
 
-
+            
 class Monster():
     number = 0
     zoo = []
-
+    
     def __init__(self, x, y=0, z=0):
         self.x = x
         self.y = y
@@ -61,11 +61,11 @@ class Monster():
         self.maxdamage = 3
         self.aggro = 3
         self.overwrite()
-
-
+        
+        
     def overwrite(self):
         pass
-
+        
     def move(self, player):
         # moving toward player?
         dx = 0
@@ -83,18 +83,18 @@ class Monster():
             return dx, dy
         else:
             return self.ai()
-
+            
     def ai(self):
         # random movement
         dx = random.choice((-1,0,0,0,1))
         dy = random.choice((-1,0,0,0,1))
         return dx, dy
-
-
-
-
+        
+            
+            
+        
 class Player(Monster):
-
+    
     def overwrite(self):
         self.char = "@"
         self.hp = 250
@@ -105,23 +105,23 @@ class Player(Monster):
         self.hunger = 0
         self.mindamage = 1
         self.maxdamage = 10
-
-
+        
+        
 class Dragon(Monster):
-
+    
     def overwrite(self):
         self.char = "D"
-        self.hp = random.randint(200,250)
+        self.hp = random.randint(300,500)
         self.defense = 0.05
         self.attack = 0.5
         self.mindamage = 10
         self.maxdamage = 20
         self.aggro = 2
-
-
-
+        
+   
+        
 class Bat(Monster):
-
+    
     def overwrite(self):
         self.char = "B"
         self.hp = random.randint(2, 7)
@@ -130,9 +130,15 @@ class Bat(Monster):
         self.mindamage = 0
         self.maxdamage = 3
         self.aggro = 5
-
-
-
+    
+    def ai(self):
+        # random movement
+        dx = random.choice((-2,-1,0,1,2))
+        dy = random.choice((-2,-1,0,1,2))
+        return dx, dy
+        
+  
+        
 def strike(a, d):
     namea = a.__class__.__name__
     named = d.__class__.__name__
@@ -153,7 +159,7 @@ def strike(a, d):
           named, damage, d.hp))
     if d.hp <= 0:
         print("{} besiegt {}".format(namea, named))
-
+ 
 
 def battle(a, d):
     print("---- Strike! -----")
@@ -161,13 +167,13 @@ def battle(a, d):
     if d.hp > 0:
         print("----Counterstrike! -----")
         strike( d, a)
-
+        
 
 
 def game():
     hero = Player(1,3,0)
     #level1 = "..k...t.....$..BB...kk...§...k....k.h.h.M..h.h.D"
-
+    
     # ---- dungeon vorbereiten ----
     dungeon = []
     for z, a in enumerate((level1, level2, level3)):
@@ -180,26 +186,26 @@ def game():
                     char = "." # Boden
                     Monster(x,y,z)
                 elif c == "B":
-                    char = "."
+                    char = "." 
                     Bat(x,y,z)
                 elif c == "D":
                     char = "."
                     Dragon(x,y,z)
                 if char == ".":
                     # bodenplatte mit zufallskäse?
-                    # käsewahrscheinlichkeit 20% -> 0.2
-                    if random.random() < 0.03:
-                        char = "k"
+                    # käsewahrscheinlichkeit  20% -> 0.2
                     if random.random() < 0.05:
-                        char = "h"
+                        char = "k"
+                    if random.random() < 0.:
+                        char = "$"   
                 line.append(char)
             level.append(line)
         dungeon.append(level)
     # dungeon ist fertig
-
+                
 
     # --- Grafik engine ----
-    while hero.hp>0 and hero.hunger < 150:
+    while hero.hp>0 and hero.hunger < 100:
         # ...
         for y, line in enumerate(dungeon[hero.z]):
             for x, char in enumerate(line):
@@ -228,25 +234,27 @@ def game():
         # treppen
         if command == "rauf" or command == "<":
             if hero.z == 0:
-                print("du bist schon in der obersten Stock!")
-            elif dungeon[hero.z][hero.y][hero.z] == "<":
+                print("du bist schon in der obersten ebene")
+            elif dungeon[hero.z][hero.y][hero.x] == "<":
                 hero.z -= 1
                 continue
             else:
                 print("Du musst eine Stiege nach oben finden (<)")
-
+        
         if command == "runter" or command == ">":
-            if dungeon [hero.z][hero.y][hero.z] == ">":
+            if hero.z == len(dungeon)-1:
+                print("Du bist schon in der untersten Ebene")
+            elif dungeon[hero.z][hero.y][hero.x] == ">":
                 hero.z += 1
                 continue
             else:
                 print("Du musst eine Stiege nach unten finden (>)")
-
+        
         if command == "exit" or command == "quit" or command == "ich will nicht mehr spielen":
             break
         if command == "hilfe" or command == "?":
             for z in legende:
-                print(z, "........", legende[z])
+                print(z, "........", legende[z])    
         # --- Monster? ---
         for m in Monster.zoo:
             if m.number == 0:
@@ -254,27 +262,27 @@ def game():
             if m.hp < 1:
                 continue
             if m.z != hero.z:
-                continue
+                continue 
             if m.x == hero.x + dx and m.y == hero.y + dy:
                 dx = 0
                 dy = 0
                 battle(hero, m)
                 break
-        # --- wand ? ---
-        if dungeon[hero.z][hero.y + dy][hero.x + dx] == "#":
+        # --- wand ? ----
+        if dungeon[hero.z][hero.y+dy][hero.x+dx] == "#":
             print("autsch, eine Wand!")
             dx = 0
             dy = 0
-        # --- türe ---
-        if dungeon[hero.z][hero.y + dy][hero.x + dx] == "d":
+        # ---- türe ? ----
+        if dungeon[hero.z][hero.y+dy][hero.x+dx] == "d":
             if hero.keys < 1:
-                print("verschlossene Türe. Finde Schlüssel(§)!")
+                print("verschlossene Türe. Finde Schlüssel (§)!")
                 dx = 0
                 dy = 0
             else:
                 hero.keys -= 1
-                dungeon[hero.z][hero.y + dy][hero.x + dx] = "."
-                print("Türe heldenhaft aufgesperrt mit schlüssel")
+                print("Türe heldenhaft aufgesperrt mit Schlüssel")
+                dungeon[hero.z][hero.y+dy][hero.x+dx] = "."
         # --- bewegung ---
         hero.x += dx
         hero.y += dy
@@ -283,8 +291,16 @@ def game():
             if m.number ==0 or m.hp <1 or m.z != hero.z:
                 continue
             dx, dy = m.move(hero)
-            # versucht Monster in Wand oder Türe zu laufen?
-            if dungeon[hero.z][m.y + dy][m.x + dx] in "#d":
+            # versucht Monster illegal den Dungeon zu verlassen?
+            # versucht Monster in Wand oder Türe zu laufen ?
+            #print("zyx:", m.z, m.y, m.x)
+            dest = "."
+            try:
+                dest = dungeon[hero.z][m.y+dy][m.x+dx]
+            except:
+                dx = 0
+                dy = 0
+            if dest in "#d":
                 dx = 0
                 dy = 0
             # versucht Monster in ein anderes Monster zu laufen?
@@ -303,9 +319,9 @@ def game():
         # ----- items -----
         # --- käse ---
         if dungeon[hero.z][hero.y][hero.x] == "k":
-            dungeon[hero.z][hero.y][hero.x] = "."
+            dungeon[hero.z][hero.y][hero.x] = "."   
             print("mmmmmm, ein guter Käse, wie lecker!")
-            hero.hunger -= random.randint(3,8)
+            hero.hunger -= random.randint(3,8) 
         #---gold---
         if dungeon[hero.z][hero.y][hero.x] == "$":
             dungeon[hero.z][hero.y][hero.x] = "."
@@ -318,7 +334,7 @@ def game():
             hero.hp += random.randint(20,25)
         # ---- schlüssel ----
         if dungeon[hero.z][hero.y][hero.x] == "§":
-            dungeon[hero.z][hero.y][hero.x] = "."
+            dungeon[hero.z][hero.y][hero.x] = "." 
             print("oh ein Schlüssel! Aber wo ist die Truhe?")
             hero.keys += 1
         # --- truhe ----
@@ -339,14 +355,14 @@ def game():
                     hero.hp += menge
                 if belohnung == "k":
                     hero.hunger -= menge
-
+    
     # --- game over ---
     print("*-*-*-*-*-*- Game Over -*-*-*-*-*-*-*-*")
-    if hero.hunger >= 150:
+    if hero.hunger >= 100:
         print("nächstes Mal mehr essen!")
     if hero.hp < 1:
         print("nächstes Mal besser kämpfen")
-
+   
     # --- Auswertung ----
     print("Du hast folgende Monster besiegt")
     menge = 0
@@ -364,11 +380,11 @@ def game():
     for name in friedhof:
         print(name, friedhof[name])
     print(" insgesamt hast Du {} Monster besiegt".format(menge))
-
-
+    
+    
 if __name__ == "__main__":
-    game()
-
-
-
-
+    game()                
+                
+        
+        
+            
