@@ -9,6 +9,7 @@ legende = {"." : "floor",
            "h" : "healing potion",
            "k" : "key",
            "b" : "box",
+           "*" : "flower",
            "#" : "wall",
            "<" : "Stair up",
            ">" : "Stair down",
@@ -16,8 +17,8 @@ legende = {"." : "floor",
 
 level1 = """
 ###################################
-#>.......#........M..............1#
-#........d..f............M........#
+#>.......#........M......P.......1#
+#....*...d..f............M........#
 #k.......#........M...............#
 ###################################"""
 
@@ -103,6 +104,8 @@ class Player(Monster):
         self.hunger = 0
         self.mindamage = 1
         self.maxdamage = 10
+        self.flowers = 0
+        self.happyend = False
         
         
 class Dragon(Monster):
@@ -115,8 +118,23 @@ class Dragon(Monster):
         self.mindamage = 10
         self.maxdamage = 20
         self.aggro = 2
+    
+class Princess(Monster):
+    
+    def overwrite(self):
+        self.char = "P"
+        self.attack = 0.1
+        self.mindamage = 1
+        self.maxdamage = 1
+        self.aggro = 2
+        self.defense = 0.1
         
-   
+    def ai(self):
+        # random movement
+        dx = random.choice((-1,0,0,0,0,0,0,0,0,0,0,1))
+        dy = random.choice((-1,0,0,0,0,0,0,0,0,0,0,1))
+        return dx, dy
+        
         
 class Bat(Monster):
     
@@ -140,6 +158,16 @@ class Bat(Monster):
 def strike(a, d):
     namea = a.__class__.__name__
     named = d.__class__.__name__
+    if named == "Princess":
+        if a.flowers < 1:
+            a.hp -= 1
+            print("The princess hits you because you are not a gentleman.You need a flower!")
+            return
+        else:
+            a.flowers -= 1
+            print("You win!")
+            a.happyend = True
+            return
     print("{} is hitting {}!".format(namea, named))
     r1 = random.random()
     if r1 > a.attack:
@@ -165,8 +193,6 @@ def battle(a, d):
     if d.hp > 0:
         print("----Counterstrike! -----")
         strike( d, a)
-        
-
 
 def game():
     hero = Player(1,3,0)
@@ -184,6 +210,9 @@ def game():
                 elif c == "B":
                     char = "." 
                     Bat(x,y,z)
+                elif c == "P":
+                    char = "."
+                    Princess(x,y,z)
                 elif c == "D":
                     char = "."
                     Dragon(x,y,z)
@@ -201,7 +230,7 @@ def game():
                 
 
     # --- Graphic engine----
-    while hero.hp>0 and hero.hunger < 100:
+    while hero.hp>0 and hero.hunger < 100 and not hero.happyend:
         # ...
         for y, line in enumerate(dungeon[hero.z]):
             for x, char in enumerate(line):
@@ -215,8 +244,8 @@ def game():
                     print(char, end="")
             print() # line-end
         print()     # dungeon end
-        command = input("hp: {} gold: {} hunger: {} keys: {} >>>".format(
-                         hero.hp, hero.gold, hero.hunger, hero.keys))
+        command = input("hp: {} gold: {} hunger: {} keys: {} flowers: {} >>>".format(
+                         hero.hp, hero.gold, hero.hunger, hero.keys, hero.flowers))
         dx = 0
         dy = 0
         if command == "a":
@@ -316,6 +345,11 @@ def game():
             dungeon[hero.z][hero.y][hero.x] = "."   
             print("yummi cheese,")
             hero.hunger -= random.randint(3,8) 
+        # --- flowers ---
+        if dungeon[hero.z][hero.y][hero.x] == "*":
+            dungeon[hero.z][hero.y][hero.x] = "."   
+            print("oh, a flower! I need to find a princess!")
+            hero.flowers += 1 
         #---gold---
         if dungeon[hero.z][hero.y][hero.x] == "$":
             dungeon[hero.z][hero.y][hero.x] = "."
@@ -374,8 +408,11 @@ def game():
     for name in friedhof:
         print(name, friedhof[name])
     print(" total kills: {} ".format(menge))
-    
-    
+    if hero.happyend and not hero.hunger < 0 and not hero.hunger > 199:
+            print("* - * - * - * - * - * - * - * - * - * - * ")
+            print("The Princessin accept the flower and she married the hero") 
+            print("You win!")
+            print("* - * - * - * - * - * - * - * - * - * - * ")
 if __name__ == "__main__":
     game()                
                 
