@@ -14,7 +14,7 @@ legende = {"." : "floor",
            "<" : "Stair up",
            ">" : "Stair down",
            "s" : "sword",
-           "o" : "shield",
+           "o" : "armor",
            "a" : "axe",
            }
 
@@ -449,8 +449,14 @@ def game():
         # --- armor ---
         if dungeon[hero.z][hero.y][hero.x] == "o":
             dungeon[hero.z][hero.y][hero.x] = "."
-            quality = ["good", "good", "perfect", "used", "broken"]
-            armors = ["golden armor","silver armor","silver armor","chain armor","chain armor","chain armor"]
+            #quality = ["good", "good", "perfect", "used", "broken"]
+            #quality1= ["good", "perfect", "used", "broken", "broken", "broken", "broken"]
+            #quality2= ["good", "perfect", "used", "broken","broken", "broken", "broken"]
+            
+            quality =["good", "good", "perfect", "used", "broken"]
+            armors= ["leather armor","leather armor","leather armor","silver armor","chain armor"]
+            
+            #armors = ["golden armor","silver armor","silver armor","chain armor","chain armor","chain armor"]
             q = random.choice(quality)
             a = random.choice(armors)
             if a == "golden armor":
@@ -465,14 +471,7 @@ def game():
                 print("oh.. {} a chain armor!".format(q))
                 hero.defensebonus = random.choice((0,0.1,0,0.1,0,0,0.1,0.1,0,0.1,0.1))
                 hero.armors.append("{} chain armor".format(q)) 
-                   
-        
-        
-        
-        
-        
-        
-         
+     
         # --- healing potion ----
         if dungeon[hero.z][hero.y][hero.x] == "h":
             dungeon[hero.z][hero.y][hero.x] = "."
