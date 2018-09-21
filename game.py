@@ -13,19 +13,22 @@ legende = {"." : "floor",
            "#" : "wall",
            "<" : "Stair up",
            ">" : "Stair down",
+           "s" : "sword",
+           "o" : "shield",
+           "a" : "axe",
            }
 
 level1 = """
 ###################################
-#>.......#........M......P.......1#
+#>.......#........M..............1#
 #....*...d..f............M........#
-#k.......#........M...............#
+#k.......#........M..........s....#
 ###################################"""
 
 level2 = """
 ###################################
 #<...............B...............2#
-#>................................#
+#>....o.................P.........#
 #..............M..................#
 ###################################"""
 
@@ -106,7 +109,31 @@ class Player(Monster):
         self.maxdamage = 10
         self.flowers = 0
         self.happyend = False
-        
+        self.weapon = "fist"
+        self.weapons = ["fist"]
+        self.damagebonus = 0
+        self.attackbonus = 0
+        self.maxdambonus = 0
+        self.mindambonus = 0    
+    
+    def select_weapon(self):
+        if len(self.weapons) == 1:
+            print("you have only one weapon. find more weapons!")
+            return
+        print("please enter number of the weapon you like to wield")
+        for number, w in enumerate(self.weapons):
+            print( number, "............", w)
+        c = input("select weapon number to wield please >>>")
+        try:
+            c = int(c)
+        except:
+            print("please enter a number only")
+            return
+        if c < 0 or c > len(self.weapons) - 1:
+            print("please enter a valid number only")
+            return 
+        self.weapon = self.weapons[c]
+            
         
 class Dragon(Monster):
     
@@ -230,7 +257,7 @@ def game():
                 
 
     # --- Graphic engine----
-    while hero.hp>0 and hero.hunger < 100 and not hero.happyend:
+    while hero.hp>0 and hero.hunger < 150 and not hero.happyend:
         # ...
         for y, line in enumerate(dungeon[hero.z]):
             for x, char in enumerate(line):
@@ -244,8 +271,8 @@ def game():
                     print(char, end="")
             print() # line-end
         print()     # dungeon end
-        command = input("hp: {} gold: {} hunger: {} keys: {} flowers: {} >>>".format(
-                         hero.hp, hero.gold, hero.hunger, hero.keys, hero.flowers))
+        command = input("hp: {} gold: {} hunger: {} keys: {} flowers: {}  mindamage: {} maxdamage: {} attack: {} defense: {} /n weapon: {} (press i to change weapon)>>>".format(
+                         hero.hp, hero.gold, hero.hunger, hero.keys, hero.flowers ,hero.mindamage , hero.maxdamage , hero.attack , hero.defense, hero.weapon))
         dx = 0
         dy = 0
         if command == "a":
@@ -256,6 +283,8 @@ def game():
             dy = -1
         if command == "s":
             dy = 1
+        if command == "i":
+            hero.select_weapon()
         # treppen
         if command == "up" or command == "<":
             if hero.z == 0:
@@ -355,6 +384,47 @@ def game():
             dungeon[hero.z][hero.y][hero.x] = "."
             print("oho, I am rich!")
             hero.gold += random.randint(10,20)
+        # --- sword ---
+        if dungeon[hero.z][hero.y][hero.x] == "s":
+            dungeon[hero.z][hero.y][hero.x] = "."
+            print("Oh..a sword!")
+            print("now you can fight better but your defense is lower!")
+            w = random.choice(["iron sword", "magic sword" "wooden sword"])
+            hero.mindambonus = random.choice((-1,0,0,1,2))
+            hero.maxdambonus = random.choice((-1,-1,0, 0, 1,1,1,2))
+            hero.attackbonus = random.choice((-0.1,0.1,-0.2,0.2))
+            hero.defensebonus = random.choice((-0.05,-0.5,0.1 ,0,1, -0.5))
+            hero.weapons.append("Sword")
+            #hero.mindamage += 4
+            #hero.maxdamage += 4
+            #hero.attack += 0.05
+            #hero.defense -= 0.05
+        # --- axe ---
+        if dungeon[hero.z][hero.y][hero.x] == "s":
+            dungeon[hero.z][hero.y][hero.x] = "."
+            print("Oh..an axe!")
+            print("now you can fight more better but your defense is more lower!")
+            hero.mindamage += 4
+            hero.maxdamage += 4
+            hero.attack += 0.05
+            hero.defense -= 0.05
+            hero.mindambonus = random.choice((-2,0,4,4,0,-2))
+            hero.maxdambonus = random.choice((-1,0,6,6,0,-1))
+            hero.attackbonus = random.choice((-0.1,0.1,-0.2,0.2))
+            hero.defensebonus = random.choice((-0.05,-0.5, 0.1, -0.5, -0.5))
+            hero.weapons.append("Axe")
+        # --- shield ---
+        if dungeon[hero.z][hero.y][hero.x] == "o":
+            dungeon[hero.z][hero.y][hero.x] = "."
+            print("Oh..a shield!")
+            print("now your defense is better but your attack is lower!")
+            hero.defense += 0.07
+            hero.attack -= 0.02
+            hero.mindambonus = random.choice((-2,0,0,0,0,0,-2))
+            hero.maxdambonus = random.choice((-1,0,0,0,0,0,-1))
+            hero.attackbonus = random.choice((0,-0.2,0,0,-0.2,0,0,0.1))
+            hero.defensebonus = random.choice((-0.1,0,0,0.5,0.5,0.5,0,0))
+            hero.weapons.append("Shield")
         # --- healing potion ----
         if dungeon[hero.z][hero.y][hero.x] == "h":
             dungeon[hero.z][hero.y][hero.x] = "."
@@ -386,7 +456,7 @@ def game():
     
     # --- game over ---
     print("*-*-*-*-*-*- Game Over -*-*-*-*-*-*-*-*")
-    if hero.hunger >= 100:
+    if hero.hunger >= 200:
         print("the next time eat more cheese!")
     if hero.hp < 1:
         print("the next time fight better!")
