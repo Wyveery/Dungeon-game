@@ -20,7 +20,7 @@ legende = {"." : "floor",
 
 level1 = """
 ###################################
-#>.......#........M..............1#
+#>...o...#........M.........o....1#
 #....*...d..f............M........#
 #k.......#........M..........s....#
 ###################################"""
@@ -34,7 +34,7 @@ level2 = """
 
 level3 = """
 ###################################
-#<......#..d.......d.............3#
+#<..o....#..d.......d............3#
 #>......####.......#..........D...#
 #......M..k........#.............k#
 ###################################"""
@@ -111,6 +111,8 @@ class Player(Monster):
         self.happyend = False
         self.weapon = "fist"
         self.weapons = ["fist"]
+        self.armor = "leather armor"
+        self.armors = ["leather armor"]
         self.damagebonus = 0
         self.attackbonus = 0
         self.maxdambonus = 0
@@ -133,7 +135,25 @@ class Player(Monster):
             print("please enter a valid number only")
             return 
         self.weapon = self.weapons[c]
-            
+    
+    def select_armor(self):
+        if len(self.armors) == 1:
+            print("you have only one armor. find more armors!")
+            return
+        print("please enter number of the armor you like to wield")
+        for number, w in enumerate(self.armors):
+            print( number, "............", w)
+        d = input("select armor number to wield please >>>")
+        try:
+            d = int(d)
+        except:
+            print("please enter a number only")
+            return
+        if d < 0 or d > len(self.armors) - 1:
+            print("please enter a valid number only")
+            return 
+        self.armors = self.armors[d]
+           
         
 class Dragon(Monster):
     
@@ -271,8 +291,8 @@ def game():
                     print(char, end="")
             print() # line-end
         print()     # dungeon end
-        command = input("hp: {} gold: {} hunger: {} keys: {} flowers: {}  mindamage: {} maxdamage: {} attack: {} defense: {} /n weapon: {} (press i to change weapon)>>>".format(
-                         hero.hp, hero.gold, hero.hunger, hero.keys, hero.flowers ,hero.mindamage , hero.maxdamage , hero.attack , hero.defense, hero.weapon))
+        command = input("hp: {} gold: {} hunger: {} keys: {} flowers: {}  mindamage: {} maxdamage: {} attack: {} defense: {}  weapon: {} - armor: {} (press i to change)>>>".format(
+                         hero.hp, hero.gold, hero.hunger, hero.keys, hero.flowers ,hero.mindamage , hero.maxdamage , hero.attack , hero.defense, hero.weapon , hero.armors))
         dx = 0
         dy = 0
         if command == "a":
@@ -285,6 +305,7 @@ def game():
             dy = 1
         if command == "i":
             hero.select_weapon()
+            hero.select_armor()
         # treppen
         if command == "up" or command == "<":
             if hero.z == 0:
@@ -414,17 +435,44 @@ def game():
             hero.defensebonus = random.choice((-0.05,-0.5, 0.1, -0.5, -0.5))
             hero.weapons.append("Axe")
         # --- shield ---
+        #if dungeon[hero.z][hero.y][hero.x] == "o":
+            #dungeon[hero.z][hero.y][hero.x] = "."
+            #print("Oh..a shield!")
+            #print("now your defense is better but your attack is lower!")
+            #hero.defense += 0.07
+            #hero.attack -= 0.02
+            #hero.mindambonus = random.choice((-2,0,0,0,0,0,-2))
+            #hero.maxdambonus = random.choice((-1,0,0,0,0,0,-1))
+            #hero.attackbonus = random.choice((0,-0.2,0,0,-0.2,0,0,0.1))
+            #hero.defensebonus = random.choice((-0.1,0,0,0.5,0.5,0.5,0,0))
+            #hero..append("Shield")
+        # --- armor ---
         if dungeon[hero.z][hero.y][hero.x] == "o":
             dungeon[hero.z][hero.y][hero.x] = "."
-            print("Oh..a shield!")
-            print("now your defense is better but your attack is lower!")
-            hero.defense += 0.07
-            hero.attack -= 0.02
-            hero.mindambonus = random.choice((-2,0,0,0,0,0,-2))
-            hero.maxdambonus = random.choice((-1,0,0,0,0,0,-1))
-            hero.attackbonus = random.choice((0,-0.2,0,0,-0.2,0,0,0.1))
-            hero.defensebonus = random.choice((-0.1,0,0,0.5,0.5,0.5,0,0))
-            hero.weapons.append("Shield")
+            quality = ["good", "good", "perfect", "used", "broken"]
+            armors = ["golden armor","silver armor","silver armor","chain armor","chain armor","chain armor"]
+            q = random.choice(quality)
+            a = random.choice(armors)
+            if a == "golden armor":
+                print("oh.. a {} golden armor!".format(q))
+                hero.defensebonus = random.choice((2,3,1,2,3,1,2,3))
+                hero.armors.append("{} golden armor".format(q))
+            if a == "silver armor":
+                print("oh.. a {} silver armor!".format(q))
+                hero.defensebonus = random.choice((0.1,0.2,0.1,0.2,0.1,0.2,0,0.2))
+                hero.armors.append("{} silver armor".format(q))
+            if a == "chain armor":
+                print("oh.. {} a chain armor!".format(q))
+                hero.defensebonus = random.choice((0,0.1,0,0.1,0,0,0.1,0.1,0,0.1,0.1))
+                hero.armors.append("{} chain armor".format(q)) 
+                   
+        
+        
+        
+        
+        
+        
+         
         # --- healing potion ----
         if dungeon[hero.z][hero.y][hero.x] == "h":
             dungeon[hero.z][hero.y][hero.x] = "."
